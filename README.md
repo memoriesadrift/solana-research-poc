@@ -10,6 +10,6 @@ node index.js
 ```
 
 # To-do
-[x] Send Transaction
-[x] Create Staking Account
-[] Delegate Stake
+- [x] Send Transaction
+- [x] Create Staking Account
+- [] Delegate Stake
