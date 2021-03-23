@@ -81,6 +81,24 @@ async function testCreateStakeAccount(
   return stakeAccount;
 }
 
+async function testDelegateStake(
+  stakeAccount,
+  authorityAccount
+) {
+  let validatorVoteAccountPubKey = new solanaWeb3.PublicKey("5MMCR4NbTZqjthjLGywmeT66iwE9J9f7kjtxzJjwfUxA");
+  let params = {
+    stakePubkey: stakeAccount.publicKey,
+    authorizedPubkey: authorityAccount.publicKey,
+    votePubkey: validatorVoteAccountPubKey
+  }
+  let tx = solanaWeb3.StakeProgram.delegate(params);
+
+  let txSignature = await solanaWeb3.sendAndConfirmTransaction(connection, createStakeAccountTx, [authorityAccount]);
+
+  console.log(`Delegated Staking Account with pubkey: ${stakeAccount.publicKey} to the validator ${validatorVoteAccountPubKey}.`);
+  console.log(`Receipt: ${"https://explorer.solana.com/tx/" + txSignature + "?cluster=devnet"}`);
+}
+
 async function main() {
   const ONE_SOL = 1000000000;
   let account1 = await newAccountWithLamports(connection);
