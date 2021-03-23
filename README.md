@@ -3,7 +3,13 @@ A simple script that creates two accounts on the Solana devnet, airdrops some fu
 
 # Run
 Install dependenciess, then run, simple.
+
 ```
 npm install 
 node index.js
 ```
+
+# To-do
+[x] Send Transaction
+[x] Create Staking Account
+[] Delegate Stake
