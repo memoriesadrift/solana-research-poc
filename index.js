@@ -85,7 +85,7 @@ async function testDelegateStake(
   stakeAccount,
   authorityAccount
 ) {
-  let validatorVoteAccountPubKey = new solanaWeb3.PublicKey("5MMCR4NbTZqjthjLGywmeT66iwE9J9f7kjtxzJjwfUxA");
+  let validatorVoteAccountPubKey = new solanaWeb3.PublicKey("5MMCR4NbTZqjthjLGywmeT66iwE9J9f7kjtxzJjwfUx2");
   console.log(`Validator key: ${validatorVoteAccountPubKey}`)
   let params = {
     stakePubkey: stakeAccount.publicKey,
@@ -105,7 +105,6 @@ async function main() {
   let account1 = await newAccountWithLamports(connection);
   let account2 = await newAccountWithLamports(connection);
 
-  /*
   let balance1 = await connection.getBalance(account1.publicKey);
   let balance2 = await connection.getBalance(account2.publicKey);
   console.log(`Balance before transfer is ${balance1 / solanaWeb3.LAMPORTS_PER_SOL} $SOL for account ${account1.publicKey} `)
@@ -118,7 +117,6 @@ async function main() {
 
   console.log(`Balance after transfer is ${balance1 / solanaWeb3.LAMPORTS_PER_SOL} $SOL for account ${account1.publicKey} `)
   console.log(`Balance after transfer is ${balance2 / solanaWeb3.LAMPORTS_PER_SOL} $SOL for account ${account2.publicKey} `)
-  */
 
   console.log(`Testing create stake account...`);
   let stakeAccount1 = await testCreateStakeAccount(account2, ONE_SOL);
