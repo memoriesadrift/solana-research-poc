@@ -96,7 +96,8 @@ async function testCreateStakeAccount(
 
   return stakeAccount;
 }
-
+[main e814ac5] Initialize not working.
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 async function testDelegateStake(
   stakeAccount,
   authorityAccount
