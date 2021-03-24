@@ -9,20 +9,23 @@ function sleep(ms) {
 }
 
 // Helper function to create an account and populate it with tokens, from solana/hello-world
+// The reason the account has to be created like this is that the airdrop function likes to take a while
+// and hangs unexpectedly from time to time - I don't know why. It seems the Solana team are aware of this
+// but since it's just a devnet / localnet feature, it doesn't really merit any worrying.
 async function newAccountWithLamports(
   connection,
-  lamports = 2000000000
+  lamports = 2000000000 // 2 SOL
 ) {
   const account = new solanaWeb3.Account();
 
-  let retries = 10;
+  let retries = 0;
   await connection.requestAirdrop(account.publicKey, lamports);
   for (; ;) {
     await sleep(500);
     if (lamports == (await connection.getBalance(account.publicKey))) {
       return account;
     }
-    if (--retries <= 0) {
+    if (++retries <= 10) {
       break;
     }
     console.log(`Airdrop retry ${retries}`);
@@ -51,15 +54,13 @@ async function testCreateStakeAccount(
   fromAccount,
   amt
 ) {
-
-  // FIXME: I haven't found a way to just generate a public key
-  // As a workaround, generating a new account generates a key pair
-  // In the Solana CLI docs, a keypair is generated for the staking account too
-  // with the private key discarded.
-  let stakeAccount = new solanaWeb3.Account();
-  let authorized = new solanaWeb3.Authorized(fromAccount.publicKey, fromAccount.publicKey);
+  let stakeAccount = new solanaWeb3.Account(); // The new stake account keypair
+  let authorized = new solanaWeb3.Authorized(fromAccount.publicKey, fromAccount.publicKey); // An object to track who is authorised to Stake or Withdraw (addresses)
   let lockup = new solanaWeb3.Lockup(0, 0, fromAccount.publicKey); // Lockup is disabled if the unix timestamp and epoch are both zero
 
+  // This is the actual transaction that creates the staking account.
+  // It can be thought that it "populates" the account created above
+  // with the necessary instructions to begin staking.
   let stakeAccountParams = {
     fromPubkey: fromAccount.publicKey,
     authorized: authorized,
@@ -85,6 +86,8 @@ async function testDelegateStake(
   stakeAccount,
   authorityAccount
 ) {
+  // This is a hardcoded value of one of the devnet validators, to obtain others, install the solana cli, connect to the devnet cluster
+  // and run solana validators
   let validatorVoteAccountPubKey = new solanaWeb3.PublicKey("5MMCR4NbTZqjthjLGywmeT66iwE9J9f7kjtxzJjwfUx2");
   console.log(`Validator key: ${validatorVoteAccountPubKey}`)
   let params = {
@@ -121,7 +124,7 @@ async function main() {
   console.log(`Testing create stake account...`);
   let stakeAccount1 = await testCreateStakeAccount(account2, ONE_SOL);
   console.log(`Testing delegating stake...`)
-  let res = await testDelegateStake(stakeAccount1, account2);
+  await testDelegateStake(stakeAccount1, account2);
 }
 
 main().catch((err) => console.log(err));
