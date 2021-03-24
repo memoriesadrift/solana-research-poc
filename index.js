@@ -78,26 +78,9 @@ async function testCreateStakeAccount(
 
   console.log(`Created Staking Account with pubkey: ${stakeAccount.publicKey}. Its balance is: ${stakeAccountBalance / solanaWeb3.LAMPORTS_PER_SOL}`);
   console.log(`Receipt: ${"https://explorer.solana.com/tx/" + txSignature + "?cluster=devnet"}`);
-
-  console.log(`Initialising staking account...`);
-  let initializeParams = {
-    authorized: authorized,
-    lockup: lockup,
-    stakePubkey: stakeAccount.publicKey
-  };
-
-  let initializeTx = new solanaWeb3.Transaction().add(
-    solanaWeb3.StakeProgram.initialize(initializeParams),
-  );
-  txSignature = await solanaWeb3.sendAndConfirmTransaction(connection, initializeTx, [fromAccount]);
-  console.log(`Initialised staking account with pubkey ${stakeAccount.publicKey}.`);
-  console.log(`Receipt: ${"https://explorer.solana.com/tx/" + txSignature + "?cluster=devnet"}`);
-
-
   return stakeAccount;
 }
-[main e814ac5] Initialize not working.
- 1 file changed, 19 insertions(+), 2 deletions(-)
+
 async function testDelegateStake(
   stakeAccount,
   authorityAccount
