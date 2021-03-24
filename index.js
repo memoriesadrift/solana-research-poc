@@ -68,6 +68,7 @@ async function testCreateStakeAccount(
     stakePubkey: stakeAccount.publicKey
   };
 
+
   let createStakeAccountTx = solanaWeb3.StakeProgram.createAccount(stakeAccountParams);
   // Tx has to be signed by the payer as well as the stake account - to prove ownership of stake account
   // "to create any account on-chain, you need some proof of ownership of a private key associated with that account.
@@ -78,6 +79,21 @@ async function testCreateStakeAccount(
   console.log(`Created Staking Account with pubkey: ${stakeAccount.publicKey}. Its balance is: ${stakeAccountBalance / solanaWeb3.LAMPORTS_PER_SOL}`);
   console.log(`Receipt: ${"https://explorer.solana.com/tx/" + txSignature + "?cluster=devnet"}`);
 
+  console.log(`Initialising staking account...`);
+  let initializeParams = {
+    authorized: authorized,
+    lockup: lockup,
+    stakePubkey: stakeAccount.publicKey
+  };
+
+  let initializeTx = new solanaWeb3.Transaction().add(
+    solanaWeb3.StakeProgram.initialize(initializeParams),
+  );
+  txSignature = await solanaWeb3.sendAndConfirmTransaction(connection, initializeTx, [fromAccount]);
+  console.log(`Initialised staking account with pubkey ${stakeAccount.publicKey}.`);
+  console.log(`Receipt: ${"https://explorer.solana.com/tx/" + txSignature + "?cluster=devnet"}`);
+
+
   return stakeAccount;
 }
 
@@ -86,6 +102,7 @@ async function testDelegateStake(
   authorityAccount
 ) {
   let validatorVoteAccountPubKey = new solanaWeb3.PublicKey("5MMCR4NbTZqjthjLGywmeT66iwE9J9f7kjtxzJjwfUxA");
+  console.log(`Validator key: ${validatorVoteAccountPubKey}`)
   let params = {
     stakePubkey: stakeAccount.publicKey,
     authorizedPubkey: authorityAccount.publicKey,
@@ -93,7 +110,7 @@ async function testDelegateStake(
   }
   let tx = solanaWeb3.StakeProgram.delegate(params);
 
-  let txSignature = await solanaWeb3.sendAndConfirmTransaction(connection, createStakeAccountTx, [authorityAccount]);
+  let txSignature = await solanaWeb3.sendAndConfirmTransaction(connection, tx, [authorityAccount]);
 
   console.log(`Delegated Staking Account with pubkey: ${stakeAccount.publicKey} to the validator ${validatorVoteAccountPubKey}.`);
   console.log(`Receipt: ${"https://explorer.solana.com/tx/" + txSignature + "?cluster=devnet"}`);
@@ -122,7 +139,7 @@ async function main() {
   console.log(`Testing create stake account...`);
   let stakeAccount1 = await testCreateStakeAccount(account2, ONE_SOL);
   console.log(`Testing delegating stake...`)
-  await testDelegateStake(stakeAccount1, account2);
+  let res = await testDelegateStake(stakeAccount1, account2);
 }
 
 main().catch((err) => console.log(err));
