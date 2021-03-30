@@ -46,8 +46,11 @@ This allows transactions to happen very quickly, a new block is created every ~4
     https://solana.com/staking#inflationrate
     
 # Staking Workflow
-
-If you transfer tokens into a stake account that is already delegated, these new tokens will not automatically be delegated. 
-In order to get these new tokens also delegated and earning rewards, you would need to un-delegate the entire account, then re-delegate the same account. 
+1. Create a Staking Account. Can be done via Solana CLI or via code in JS / Rust ->  An on-chain transaction.
+2. Send funds to Staking Account.
+3. Delegate your Staking Account to a validator.
+## On Adding Stake, Redelegating
+If you transfer tokens into a stake account that is already delegated, these new tokens **will not automatically be delegated.**
+In order to get these new tokens also delegated and earning rewards, you would need to *un-delegate the entire account, then re-delegate the same account.*
 As un-delegating and re-delegating can take several days to take effect, your original stake would not be earning rewards during this transition period
 *Therefore, we recommend only transferring SOL into a stake account when it is first created or otherwise not delegated.*
