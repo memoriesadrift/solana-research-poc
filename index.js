@@ -103,6 +103,44 @@ async function testDelegateStake(
   console.log(`Receipt: ${"https://explorer.solana.com/tx/" + txSignature + "?cluster=devnet"}`);
 }
 
+async function createStakeAccountAndDelegate(
+  fromAccount,
+  amt,
+) {
+  let stakeAccount = new solanaWeb3.Account(); // The new stake account keypair
+  let authorized = new solanaWeb3.Authorized(fromAccount.publicKey, fromAccount.publicKey); // An object to track who is authorised to Stake or Withdraw (addresses)
+  let lockup = new solanaWeb3.Lockup(0, 0, fromAccount.publicKey); // Lockup is disabled if the unix timestamp and epoch are both zero
+
+  // This is the actual transaction that creates the staking account.
+  // It can be thought that it "populates" the account created above
+  // with the necessary instructions to begin staking.
+  let stakeAccountParams = {
+    fromPubkey: fromAccount.publicKey,
+    authorized: authorized,
+    lamports: amt,
+    lockup: lockup,
+    stakePubkey: stakeAccount.publicKey
+  };
+
+  let validatorVoteAccountPubKey = new solanaWeb3.PublicKey("5MMCR4NbTZqjthjLGywmeT66iwE9J9f7kjtxzJjwfUx2");
+  let delegateParams = {
+    stakePubkey: stakeAccount.publicKey,
+    authorizedPubkey: fromAccount.publicKey,
+    votePubkey: validatorVoteAccountPubKey
+  }
+
+  let createStakeAccountTx = solanaWeb3.StakeProgram.createAccount(stakeAccountParams);
+  let delegateTx = solanaWeb3.StakeProgram.delegate(delegateParams);
+  let tx = new solanaWeb3.Transaction();
+  tx.add(createStakeAccountTx, delegateTx);
+
+  let txSignature = await solanaWeb3.sendAndConfirmTransaction(connection, tx, [fromAccount, stakeAccount]);
+
+  //console.log(`Created Staking Account with pubkey: ${stakeAccount.publicKey}. Its balance is: ${stakeAccountBalance / solanaWeb3.LAMPORTS_PER_SOL}`);
+  console.log(`Receipt: ${"https://explorer.solana.com/tx/" + txSignature + "?cluster=devnet"}`);
+  return stakeAccount;
+}
+
 async function main() {
   const ONE_SOL = 1000000000;
   let account1 = await newAccountWithLamports(connection);
@@ -121,10 +159,8 @@ async function main() {
   console.log(`Balance after transfer is ${balance1 / solanaWeb3.LAMPORTS_PER_SOL} $SOL for account ${account1.publicKey} `)
   console.log(`Balance after transfer is ${balance2 / solanaWeb3.LAMPORTS_PER_SOL} $SOL for account ${account2.publicKey} `)
 
-  console.log(`Testing create stake account...`);
-  let stakeAccount1 = await testCreateStakeAccount(account2, ONE_SOL);
-  console.log(`Testing delegating stake...`)
-  await testDelegateStake(stakeAccount1, account2);
+  console.log(`Testing create and delegate stake account...`);
+  let stakeAccount1 = await createStakeAccountAndDelegate(account2, ONE_SOL);
 }
 
 main().catch((err) => console.log(err));

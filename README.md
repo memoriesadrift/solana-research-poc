@@ -1,4 +1,5 @@
-# Solana Transaction Demo
+To github.com:memoriesadrift/solana-research-poc.git
+   dfa87c9..f242128  main -> main
 A simple script that creates two accounts on the Solana devnet, airdrops some funds into them and then transfers funds from one account to the other. 
 
 # Run
