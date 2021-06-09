@@ -1,6 +1,6 @@
 const solanaWeb3 = require('@solana/web3.js');
 
-const url = 'https://devnet.solana.com';
+const url = 'https://api.devnet.solana.com';
 const connection = new solanaWeb3.Connection(url, 'singleGossip');
 
 // Helper function for newAccountWithLamports from solana/hello-world
